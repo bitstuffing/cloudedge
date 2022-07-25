@@ -14,23 +14,30 @@ class Cloudedge:
     LOGIN = "meari/app/login"
     LOGOUT = "ppstrongs/logOut.action"
 
-    KEY = "bc29be30292a4309877807e101afbd51"
+    GET_DEVICE = "ppstrongs/getDevice.action"
+    GET_ALERT_LIST = "pps/msg/alert/list"
 
-    def getHeaders(self):
+    APP_HOME_LIST = "v1/app/home/list"
+
+    KEY = "bc29be30292a4309877807e101afbd51"
+    SIGNATURE = "35a69fd1-6527-4566-b190-921f9a651488"
+
+    def getHeaders(self,endpoint="meari/app/login",form=True):
 
         timestamp = str(round(time.time() * 1000))
         nonce = str(random.randint(100000, 999999))
-        sign = "api=/ppstrongs//meari/app/login|X-Ca-Key={key}|X-Ca-Timestamp={timestamp}|X-Ca-Nonce={nonce}".format(key=KEY, timestamp=timestamp, nonce=nonce)
+        sign = "api=/ppstrongs//{endpoint}|X-Ca-Key={key}|X-Ca-Timestamp={timestamp}|X-Ca-Nonce={nonce}".format(endpoint=endpoint,key=KEY, timestamp=timestamp, nonce=nonce)
 
         headers = {
             "accept-language" : "es-ES;q=0.8",
             "user-agent" : "Mozilla/5.0 (Linux; U; Android 7.0; es-es; T10(E3C5) Build/NRD90M) AppleWebKit/533.1 (KHTML, like Gecko) Version/5.0 Mobile Safari/533.1",
-            "x-ca-key" : KEY,
-            "x-ca-sign" : make_digest(sign, "35a69fd1-6527-4566-b190-921f9a651488"),
+            "x-ca-key" : self.KEY,
+            "x-ca-sign" : make_digest(sign, self.SIGNATURE),
             "x-ca-timestamp": timestamp,
-            "x-ca-nonce": nonce,
-            "content-type": "application/x-www-form-urlencoded",
+            "x-ca-nonce": nonce
         }
+        if form:
+            headers["content-type"] = "application/x-www-form-urlencoded"
 
         return headers
 
@@ -62,8 +69,7 @@ class Cloudedge:
         self.token = data["result"]["userToken"]
         return data
 
-
-    def logout(self):
+    def getNormalData(self):
         data = {
             "userID" : self.userId,
             "phoneCode" : "34",
@@ -76,8 +82,40 @@ class Cloudedge:
             "sourceApp" : 8,
             "appVerCode" : 433
         }
+        return data
 
+    def logout(self):
+        data = self.getNormalData()
         form = urlencode(data)
         response = self.session.post("https://%s/%s" % (self.HOST,self.LOGOUT), data=form, headers=self.getHeaders() )
+        data = response.json()
+        return data
+
+    def getDevicesInfo(self):
+        data = self.getNormalData()
+        form = urlencode(data)
+        response = self.session.post("https://%s/%s" % (self.HOST,self.GET_DEVICE), data=form, headers=self.getHeaders(endpoint=self.GET_DEVICE,form=True) )
+        data = response.json()
+        return data
+
+    def getAlertList(self, day="20220725", deviceId=""):
+        data = self.getNormalData()
+        data["day"] = day
+        data["deviceID"] = deviceId
+        form = urlencode(data)
+        response = self.session.post("https://%s/%s" % (self.HOST,self.GET_ALERT_LIST), data=form, headers=self.getHeaders(endpoint=self.GET_ALERT_LIST,form=True) )
+        data = response.json()
+        return data
+
+    
+
+
+    '''
+    TODO
+    '''
+    def getAppHomeList(self):
+        data = self.getNormalData()
+        form = urlencode(data)
+        response = self.session.get("https://%s/%s" % (self.HOST,self.APP_HOME_LIST), data=form, headers=self.getHeaders(endpoint=self.APP_HOME_LIST,form=False) )
         data = response.json()
         return data
