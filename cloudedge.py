@@ -4,10 +4,13 @@ import json
 import random
 import time
 from urllib.parse import urlencode
+from authlib.jose import jwt
 from crypto import *
 
 
 class Cloudedge:
+
+    BROWSER = "Mozilla/5.0 (Linux; U; Android 7.0; es-es; T10(E3C5) Build/NRD90M) AppleWebKit/533.1 (KHTML, like Gecko) Version/5.0 Mobile Safari/533.1"
 
     HOST = "apis-eu-frankfurt.cloudedge360.com"
     # API EndPoints
@@ -16,6 +19,8 @@ class Cloudedge:
 
     GET_DEVICE = "ppstrongs/getDevice.action"
     GET_ALERT_LIST = "pps/msg/alert/list"
+
+    CLOUD_APP_ALERT_OSS_TOKEN = "cloud/app/alert-img/oss-down-token"
 
     APP_HOME_LIST = "v1/app/home/list"
 
@@ -30,7 +35,7 @@ class Cloudedge:
 
         headers = {
             "accept-language" : "es-ES;q=0.8",
-            "user-agent" : "Mozilla/5.0 (Linux; U; Android 7.0; es-es; T10(E3C5) Build/NRD90M) AppleWebKit/533.1 (KHTML, like Gecko) Version/5.0 Mobile Safari/533.1",
+            "user-agent" : self.BROWSER
             "x-ca-key" : self.KEY,
             "x-ca-sign" : make_digest(sign, self.SIGNATURE),
             "x-ca-timestamp": timestamp,
@@ -107,15 +112,51 @@ class Cloudedge:
         data = response.json()
         return data
 
-    
+    '''
+
+    In dev...
+    next it's a big TODO xD
+
+    '''
 
 
     '''
-    TODO
+    To get it working you just need to know how to manage a JWT.
+    Target is -> "alg": "HS1"
     '''
+    def getOssDownToken(self,deviceID):
+        data = self.getNormalData()
+        '''
+        token = jwt.encode(
+            payload = data,
+            key = self.token, #getUserInfo().getUserToken()
+            algorithm = "HMAC-SHA1" #it's too insecure, so we need other library or a vanilla implementation :'(
+        )
+        print(token)
+        '''
+        header = {
+            "typ": "JWT",
+            "alg": "HS256" #needs HMAC-SHA1 - HS1 and it's unsupported in current production implementations for insecure SHA1 algorithm
+        }
+        token = jwt.encode(header,data,self.token)
+        print(token)
+        headers = {
+            "accept-language" : "es-ES,es;q=0.8",
+            "user-agent" : self.BROWSER,
+            "phonetype" : "a",
+            "jwt" : token
+        }
+        form = {
+            "deviceID" : deviceID
+        }
+        form = urlencode(form)
+        response = self.session.get("https://%s/%s" % (self.HOST,self.CLOUD_APP_ALERT_OSS_TOKEN), data=form, headers=headers )
+        data = response.json()
+        return data
+
     def getAppHomeList(self):
         data = self.getNormalData()
-        form = urlencode(data)
-        response = self.session.get("https://%s/%s" % (self.HOST,self.APP_HOME_LIST), data=form, headers=self.getHeaders(endpoint=self.APP_HOME_LIST,form=False) )
+        #form = urlencode(data)
+        response = self.session.get("https://%s/%s" % (self.HOST,self.APP_HOME_LIST), data=data, headers=self.getHeaders(endpoint=self.APP_HOME_LIST,form=False) )
         data = response.json()
         return data
