@@ -25,7 +25,8 @@ but his investigation & method requires direct access to the hardwdare,
 including some tricks.
 
 # LICENSE
-All the code in all files, including display drivers, is released under CC 4.0 license,
-developed by @bitstuffing with love. Basically you're able to learn, read, edit and
-use that, but if you use that code you MUST reference the author.
+All the code in all files, is released under CC 4.0 license and developed by
+@bitstuffing with love.
+Basically you're able to learn, read, edit and use that, but if you use that
+code you MUST reference the author.
 Don't sell any fraction of this code, without the explicit permission of the author.
