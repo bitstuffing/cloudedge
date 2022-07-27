@@ -4,7 +4,6 @@ import json
 import random
 import time
 from urllib.parse import urlencode
-from authlib.jose import jwt
 from crypto import *
 
 
@@ -113,32 +112,12 @@ class Cloudedge:
         return data
 
     '''
-
     In dev...
     next it's a big TODO xD
-
-    '''
-
-
-    '''
-    To get it working you just need to know how to manage a JWT.
-    Target is -> "alg": "HS1"
     '''
     def getOssDownToken(self,deviceID):
         data = self.getNormalData()
-        '''
-        token = jwt.encode(
-            payload = data,
-            key = self.token, #getUserInfo().getUserToken()
-            algorithm = "HMAC-SHA1" #it's too insecure, so we need other library or a vanilla implementation :'(
-        )
-        print(token)
-        '''
-        header = {
-            "typ": "JWT",
-            "alg": "HS1" #needs HMAC-SHA1 - HS1 and it's unsupported in current production implementations for insecure SHA1 algorithm
-        }
-        token = jwt.encode(header,data,self.token)
+        token = jwt(data,self.token)
         print(token)
         headers = {
             "accept-language" : "es-ES,es;q=0.8",
