@@ -122,7 +122,6 @@ class Cloudedge:
     def getOssDownToken(self,deviceID):
         data = self.getNormalData()
         token = jwt(data,self.token)
-        print(token)
         data = {}
         if verify_jwt(token, self.token):
             headers = {
@@ -135,7 +134,6 @@ class Cloudedge:
                 "deviceID" : deviceID
             }
             form = urlencode(form)
-            print(form)
             response = self.session.get("https://%s/%s?%s" % (self.HOST,self.CLOUD_APP_ALERT_OSS_TOKEN,form), headers=headers )
             data = response.json()
         return data
