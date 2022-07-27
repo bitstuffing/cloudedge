@@ -35,7 +35,7 @@ class Cloudedge:
 
         headers = {
             "accept-language" : "es-ES;q=0.8",
-            "user-agent" : self.BROWSER
+            "user-agent" : self.BROWSER,
             "x-ca-key" : self.KEY,
             "x-ca-sign" : make_digest(sign, self.SIGNATURE),
             "x-ca-timestamp": timestamp,
@@ -136,7 +136,7 @@ class Cloudedge:
         '''
         header = {
             "typ": "JWT",
-            "alg": "HS256" #needs HMAC-SHA1 - HS1 and it's unsupported in current production implementations for insecure SHA1 algorithm
+            "alg": "HS1" #needs HMAC-SHA1 - HS1 and it's unsupported in current production implementations for insecure SHA1 algorithm
         }
         token = jwt.encode(header,data,self.token)
         print(token)
