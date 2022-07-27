@@ -18,6 +18,7 @@ class Cloudedge:
 
     GET_DEVICE = "ppstrongs/getDevice.action"
     GET_ALERT_LIST = "pps/msg/alert/list"
+    PPS_MESSAGE_HAS = "pps/message/has"
 
     CLOUD_APP_ALERT_OSS_TOKEN = "cloud/app/alert-img/oss-down-token"
 
@@ -111,6 +112,13 @@ class Cloudedge:
         data = response.json()
         return data
 
+    def hasMessages(self):
+        data = self.getNormalData()
+        form = urlencode(data)
+        response = self.session.post("https://%s/%s" % (self.HOST,self.PPS_MESSAGE_HAS), data=data, headers=self.getHeaders(endpoint=self.PPS_MESSAGE_HAS,form=True) )
+        data = response.json()
+        return data
+
     '''
     In dev...
     next it's a big TODO xD
@@ -129,6 +137,7 @@ class Cloudedge:
             "deviceID" : deviceID
         }
         form = urlencode(form)
+        print(form)
         response = self.session.get("https://%s/%s" % (self.HOST,self.CLOUD_APP_ALERT_OSS_TOKEN), data=form, headers=headers )
         data = response.json()
         return data

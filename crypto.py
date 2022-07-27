@@ -38,7 +38,7 @@ def base64url_encode(input: bytes):
     return base64.urlsafe_b64encode(input).decode('utf-8').replace('=','')
 
 '''
-Custom implementation for SHA1
+Custom implementation for SHA1 v1
 '''
 def jwt(payload, token):
 
@@ -64,3 +64,25 @@ def jwt(payload, token):
     encoded_string = ".".join(segments)
 
     return encoded_string
+
+'''
+Custom v2 devs for JWT
+
+def base64url_decode(input):
+    return base64.urlsafe_b64decode(input+'==')
+
+def base64url_encode(input):
+    stringAsBytes = input.encode('ascii')
+    stringAsBase64 = base64.urlsafe_b64encode(stringAsBytes).decode('utf-8').replace('=','')
+    return stringAsBase64
+
+def jwt(payload, secret_key):
+    header = {
+        "alg": "HS1",
+        "typ": "JWT"
+    }
+    total_params = str(base64url_encode(json.dumps(header))) + '.' + str(base64url_encode(json.dumps(payload)))
+    signature = hmac.new(secret_key.encode(), total_params.encode(), hashlib.sha1).hexdigest()
+    token = total_params + '.' + str(base64url_encode(signature))
+    return token
+'''
