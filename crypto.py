@@ -59,11 +59,20 @@ def jwt(payload, token):
     key = token.encode()
     signature = hmac.new(key, signing_input, hashlib.sha1).digest()
 
-    segments.append(base64url_encode(signature))
+    final_signature = base64.b64encode(signature).decode()
+    segments.append(final_signature)
+    #segments.append(base64url_encode(signature))
 
     encoded_string = ".".join(segments)
 
     return encoded_string
+
+def verify_jwt(payload,token):
+    segments = payload.split(".")
+    signature = hmac.new(token.encode(),(segments[0]+"."+segments[1]).encode(),hashlib.sha1).digest()
+    print(base64.b64encode(signature).decode())
+    print(segments[2])
+    return base64.b64encode(signature).decode() == segments[2]
 
 '''
 Custom v2 devs for JWT
