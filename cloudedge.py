@@ -76,7 +76,7 @@ class Cloudedge:
 
     def getNormalData(self):
         data = {
-            "userID" : self.userId,
+            "userID" : str(self.userId),
             "phoneCode" : "34",
             "t" : str(round(time.time() * 1000)),
             "countryCode" : "ES",
@@ -84,8 +84,8 @@ class Cloudedge:
             "appVer" : "4.3.3",
             "IngType" : "es",
             "userToken" : self.token,
-            "sourceApp" : 8,
-            "appVerCode" : 433
+            "sourceApp" : str(8),
+            "appVerCode" : str(433)
         }
         return data
 
@@ -119,29 +119,31 @@ class Cloudedge:
         data = response.json()
         return data
 
-    '''
-    In dev...
-    next it's a big TODO xD
-    '''
     def getOssDownToken(self,deviceID):
         data = self.getNormalData()
         token = jwt(data,self.token)
         print(token)
-        headers = {
-            "accept-language" : "es-ES,es;q=0.8",
-            "user-agent" : self.BROWSER,
-            "phonetype" : "a",
-            "jwt" : token
-        }
-        form = {
-            "deviceID" : deviceID
-        }
-        form = urlencode(form)
-        print(form)
-        response = self.session.get("https://%s/%s" % (self.HOST,self.CLOUD_APP_ALERT_OSS_TOKEN), data=form, headers=headers )
-        data = response.json()
+        data = {}
+        if verify_jwt(token, self.token):
+            headers = {
+                "accept-language" : "es-ES,es;q=0.8",
+                "user-agent" : self.BROWSER,
+                "phonetype" : "a",
+                "jwt" : token
+            }
+            form = {
+                "deviceID" : deviceID
+            }
+            form = urlencode(form)
+            print(form)
+            response = self.session.get("https://%s/%s?%s" % (self.HOST,self.CLOUD_APP_ALERT_OSS_TOKEN,form), headers=headers )
+            data = response.json()
         return data
 
+    '''
+    In dev...
+    next it's a big TODO xD
+    '''
     def getAppHomeList(self):
         data = self.getNormalData()
         #form = urlencode(data)
