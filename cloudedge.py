@@ -19,7 +19,6 @@ class Cloudedge:
     GET_DEVICE = "ppstrongs/getDevice.action"
     GET_ALERT_LIST = "pps/msg/alert/list"
     PPS_MESSAGE_HAS = "pps/message/has"
-
     CLOUD_APP_ALERT_OSS_TOKEN = "cloud/app/alert-img/oss-down-token"
 
     APP_HOME_LIST = "v1/app/home/list"
@@ -110,6 +109,18 @@ class Cloudedge:
         form = urlencode(data)
         response = self.session.post("https://%s/%s" % (self.HOST,self.GET_ALERT_LIST), data=form, headers=self.getHeaders(endpoint=self.GET_ALERT_LIST,form=True) )
         data = response.json()
+        '''
+        {...
+            "alertMsg": [
+                {
+                    "imgUrl" : "https...",
+                    "devLocalTime" : "YYYYMMDDHHmmSS",
+                    "expire" : "-timestamp-",
+                    "deviceId" : "..."
+                }, ....
+            ]
+        }
+        '''
         return data
 
     def hasMessages(self):
@@ -137,6 +148,16 @@ class Cloudedge:
             response = self.session.get("https://%s/%s?%s" % (self.HOST,self.CLOUD_APP_ALERT_OSS_TOKEN,form), headers=headers )
             data = response.json()
         return data
+
+    def getImage(self, url, expires, accessKey, signature, token):
+        response = self.request.get("%s?Expires=%s&OSSAccessKeyId=%s&Signature=%s&security-token=%s" % (url,expires,accessKey,signature,token), stream=True)
+        if response.status_code == 200:
+            file_name = url[url.rfind("/")+1:]
+            with open(file_name, 'wb') as out_file:
+                for chunk in r:
+                    f.write(chunk)
+
+
 
     '''
     In dev...
